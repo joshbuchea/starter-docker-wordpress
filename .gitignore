@@ -1,0 +1,15 @@
+# Docker
+.data/
+
+# OSX
+#
+.DS_Store
+
+# node.js
+#
+node_modules/
+npm-debug.log
+
+# General folders and files to ignore
+tmp
+temp
