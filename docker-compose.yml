@@ -56,7 +56,7 @@ services:
   wordpress:
     image: wordpress:latest
     volumes:
-      - ".www/:/var/www/html"
+      - "./www:/var/www/html"
     depends_on:
       - db
     links:
