@@ -11,7 +11,7 @@
 # Make your directory look like this:
 #
 # - ./docker-compose.yml (this file)
-# - ./ (should contain www files for developing)
+# - ./www (should contain www files for developing)
 # - ./initdb (All sql files in here will be run when docker-compose is first ran)
 # - ./initdb/dump.sql (Example of putting your mysql dump in here)
 #
@@ -56,7 +56,7 @@ services:
   wordpress:
     image: wordpress:latest
     volumes:
-      - "./:/var/www/html"
+      - ".www/:/var/www/html"
     depends_on:
       - db
     links:
@@ -94,4 +94,4 @@ services:
       - db
       - wordpress
     volumes:
-      - ./:/var/www/wp_html
+      - ./www:/var/www/wp_html
