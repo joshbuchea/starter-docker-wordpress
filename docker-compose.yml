@@ -1,15 +1,57 @@
+###
+# What's included:
+# - WordPress container (defaults to port 8888)
+# - database container (connected automagically to WordPress)
+# - phpmyadmin container (defaults to port 8080)
+# - searchreplacedb container (defaults to port 8081, connects automagically to mysql)
+#
+#
+# Instructions:
+#
+# Make your directory look like this:
+#
+# - ./docker-compose.yml (this file)
+# - ./ (should contain www files for developing)
+# - ./initdb (All sql files in here will be run when docker-compose is first ran)
+# - ./initdb/dump.sql (Example of putting your mysql dump in here)
+#
+# Note on importing SQL files:
+#   By default the WordPress and SearchReplaceDB contianers use the database called `wordpress`.
+#   It is reccomened that your sql init file starts with 'USE `wordpress`;' to make sure
+#   the correct database is selected.
+#
+# To get started, run:
+# docker-compose up -d
+#
+#
+# Troubleshooting:
+#
+# WordPress and/or phpmyadmin indicate there's no mysql connection
+# - If you have sql files in initdb, it may take a while to import, delaying mysql to start.
+#   You can check the status of mysql with docker logs
+#
+# SearchReplaceDB is giving me errors on my wordpress tables
+# - It's possible your import sql files
+#
+# How do I re-import?
+# - To reimport, you just need to stop the docker containers (docker-compose down),
+#   delete the .data directory created by mysql, and then run docker-compose up -d.
+##
+
 version: '2'
 services:
   db:
     image: mysql:5.7
     volumes:
       - "./.data/db:/var/lib/mysql"
+      - "./initdb:/docker-entrypoint-initdb.d" # runs dump.sql after container created
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: wordpress # change to complex pwd for production
       MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpress
+      # Uncomment below fields to optionally create an additional user account
+      # MYSQL_USER: wordpress
+      # MYSQL_PASSWORD: wordpress
 
   wordpress:
     image: wordpress:latest
@@ -20,11 +62,11 @@ services:
     links:
       - db
     ports:
-      - "8000:80"
+      - "8000:80" # change to "80:80" for Production
     restart: unless-stopped
     environment:
       WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "db"
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -36,8 +78,11 @@ services:
       - db
     restart: unless-stopped
     environment:
-      PMA_USER: root
-      PMA_PASSWORD: wordpress
+      MYSQL_USERNAME: root
+      MYSQL_ROOT_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "db"
+      # Uncomment below fields on local to enable auto-login for phpMyAdmin:
+      # PMA_USER: root
+      # PMA_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "db"
 
   searchreplacedb:
     image: proq/search-replace-db
