@@ -5,6 +5,7 @@
 - Build & Start Container(s), run in background: `docker-compose up -d`
 - Start Container(s): `docker-compose start`
 - Stop Containers: `docker-compose stop`
+- Stop & Remove Containers: `docker-compose down`
 
 ## Ports
 
