@@ -1,6 +1,6 @@
 ###
 # What's included:
-# - WordPress container (defaults to port 8888)
+# - WordPress container (defaults to port 8000)
 # - database container (connected automagically to WordPress)
 # - phpmyadmin container (defaults to port 8080)
 # - searchreplacedb container (defaults to port 8081, connects automagically to mysql)
