@@ -40,7 +40,7 @@
 
 version: '2'
 services:
-  db:
+  mysql:
     image: mysql:5.7
     volumes:
       - "./.data/db:/var/lib/mysql"
@@ -50,48 +50,65 @@ services:
       MYSQL_ROOT_PASSWORD: wordpress # change to complex pwd for production
       MYSQL_DATABASE: wordpress
       # Uncomment below fields to optionally create an additional user account
-      # MYSQL_USER: wordpress
-      # MYSQL_PASSWORD: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
 
   wordpress:
     image: wordpress:latest
     volumes:
       - "./www:/var/www/html"
     depends_on:
-      - db
+      - mysql
     links:
-      - db
+      - mysql
     ports:
       - "8000:80" # change to "80:80" for Production
     restart: unless-stopped
     environment:
-      WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "db"
+      WORDPRESS_DB_HOST: mysql:3306
+      # WORDPRESS_DB_NAME: wordpress
+      # WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+
+  backup:
+    image: aveltens/wordpress-backup
+    volumes:
+      - "./backups:/backups"
+    volumes_from:
+      - wordpress
+    links:
+      - mysql
+    environment:
+      MYSQL_ENV_MYSQL_USER: wordpress
+      MYSQL_ENV_MYSQL_DATABASE: wordpress
+      MYSQL_ENV_MYSQL_PASSWORD: wordpress
+      CLEANUP_OLDER_THAN: 3 # number of days to keep backups
+      # BACKUP_TIME: "0 3 * * *" # cron expression (default: 3AM)
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     links:
-      - db
+      - mysql
     ports:
       - "8080:80"
     depends_on:
-      - db
+      - mysql
     restart: unless-stopped
     environment:
       MYSQL_USERNAME: root
-      MYSQL_ROOT_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "db"
+      MYSQL_ROOT_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "mysql"
       # Uncomment below fields on local to enable auto-login for phpMyAdmin:
       # PMA_USER: root
-      # PMA_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "db"
+      # PMA_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "mysql"
 
   searchreplacedb:
     image: proq/search-replace-db
     links:
-      - db
+      - mysql
     ports:
       - "8081:80"
     depends_on:
-      - db
+      - mysql
       - wordpress
     volumes:
       - ./www:/var/www/wp_html
