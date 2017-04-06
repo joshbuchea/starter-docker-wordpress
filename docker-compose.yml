@@ -40,6 +40,7 @@
 
 version: '2'
 services:
+
   mysql:
     image: mysql:5.7
     volumes:
@@ -55,14 +56,14 @@ services:
 
   wordpress:
     image: wordpress:latest
-    volumes:
-      - "./www:/var/www/html"
-    depends_on:
-      - mysql
     links:
+      - mysql
+    depends_on:
       - mysql
     ports:
       - "8000:80" # change to "80:80" for Production
+    volumes:
+      - "./www:/var/www/html"
     restart: unless-stopped
     environment:
       WORDPRESS_DB_HOST: mysql:3306
@@ -72,12 +73,12 @@ services:
 
   backup:
     image: aveltens/wordpress-backup
+    links:
+      - mysql
     volumes:
       - "./backups:/backups"
     volumes_from:
       - wordpress
-    links:
-      - mysql
     environment:
       MYSQL_ENV_MYSQL_USER: wordpress
       MYSQL_ENV_MYSQL_DATABASE: wordpress
@@ -89,10 +90,10 @@ services:
     image: phpmyadmin/phpmyadmin
     links:
       - mysql
-    ports:
-      - "8080:80"
     depends_on:
       - mysql
+    ports:
+      - "8080:80"
     restart: unless-stopped
     environment:
       MYSQL_USERNAME: root
@@ -106,10 +107,10 @@ services:
     image: proq/search-replace-db
     links:
       - mysql
-    ports:
-      - "8081:80"
     depends_on:
       - mysql
       - wordpress
+    ports:
+      - "8081:80"
     volumes:
       - ./www:/var/www/wp_html
