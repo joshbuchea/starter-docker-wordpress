@@ -97,6 +97,7 @@ services:
     environment:
       MYSQL_USERNAME: root
       MYSQL_ROOT_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "mysql"
+      PMA_HOST: mysql
       # Uncomment below fields on local to enable auto-login for phpMyAdmin:
       # PMA_USER: root
       # PMA_PASSWORD: wordpress # should match MYSQL_ROOT_PASSWORD defined in "mysql"
