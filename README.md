@@ -7,7 +7,7 @@
 - Stop Containers: `docker-compose stop`
 - Stop & Remove Containers: `docker-compose down`
 
-## Ports
+## Containers
 
 - MySQL: Port `3306`
 - WordPress: Port `8000`
